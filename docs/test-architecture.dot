@@ -1,0 +1,33 @@
+digraph SkiCalcTest {
+    // 统一字体以避免中文乱码
+    graph [rankdir=LR, fontname="Microsoft YaHei", fontsize=11, labelloc="t"];
+    node  [shape=box, style=rounded, fontname="Microsoft YaHei", fontsize=11];
+    edge  [fontname="Microsoft YaHei", fontsize=11];
+
+    subgraph cluster_runtime {
+        label="运行时数据流";
+        Input [label="用户输入\n(std::cin / string)"];
+        Driver [label="Driver\n(逐行驱动)"];
+        Lexer [label="Lexer\n(tokenize)\n非法字符→SyntaxError"];
+        Parser [label="Parser\n(expr/term/prim)"];
+        Symtab [label="符号表\n(map<string,double>)"];
+        Output [label="结果/错误输出\n(std::cout / std::cerr)"];
+
+        Input -> Driver -> Lexer -> Parser;
+        Parser -> Symtab;
+        Symtab -> Parser;
+        Parser -> Output;
+    }
+
+    subgraph cluster_tests {
+        label="测试集";
+        node [shape=note];
+        TDriver [label="DriverTest\n集成+IO"];
+        TLexer [label="LexerTest\nToken/非法字符"];
+        TParser [label="ParserTest\n语法/语义"];
+    }
+
+    TDriver -> Driver [style=dashed, label="模拟流\n捕获输出"]; 
+    TLexer -> Lexer [style=dashed, label="单元\n非法字符/中文"];
+    TParser -> Parser [style=dashed, label="单元\nZeroDivide/语法错误"];
+}

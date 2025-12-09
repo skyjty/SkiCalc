@@ -1,12 +1,14 @@
 #include "Lexer.h"
+#include "Error.h"
 #include <cctype>
 #include <iostream>
+#include <string>
 
 TokenType Lexer::getToken(std::istream& in) {
     char ch;
     do {
         if (!in.get(ch)) return currToken = TokenType::END;
-    } while (isspace(ch));
+    } while (isspace(static_cast<unsigned char>(ch)));
 
     switch (ch) {
     case '+': return currToken = TokenType::PLUS;
@@ -27,12 +29,17 @@ TokenType Lexer::getToken(std::istream& in) {
     }
 
     default:
-        if (isalpha(ch) || ch == '_') {
+        if (isalpha(static_cast<unsigned char>(ch)) || ch == '_') {
             stringValue = ch;
-            while (in.get(ch) && (isalnum(ch) || ch == '_')) stringValue += ch;
-            in.putback(ch);
+            while (in.get(ch) && (isalnum(static_cast<unsigned char>(ch)) || ch == '_')) stringValue += ch;
+            // 如果上一次读取失败(in.get 返回 false)，ch 值未定义，不应 putback
+            if (in) in.putback(ch);
             return currToken = TokenType::NAME;
         }
-        return currToken = TokenType::END;
+        {
+            std::string msg = "invalid character: ";
+            msg += ch;
+            throw SyntaxError(msg.c_str());
+        }
     }
 }

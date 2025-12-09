@@ -1,10 +1,11 @@
 #include "LexerTest.h"
+#include "Error.h"
 
 // 数字token测试
 TEST_F(LexerTest, TokenizeNumber) {
     // 整数测试
-    EXPECT_EQ(nextToken("42"), TokenType::NUMBER);
-    EXPECT_DOUBLE_EQ(lexer.numberValue, 42.0);
+    EXPECT_EQ(nextToken("31"), TokenType::NUMBER);
+    EXPECT_DOUBLE_EQ(lexer.numberValue, 31.0);
 
     // 浮点数测试
     EXPECT_EQ(nextToken("3.14"), TokenType::NUMBER);
@@ -78,4 +79,19 @@ TEST_F(LexerTest, TokenizeMultipleTokens) {
     EXPECT_DOUBLE_EQ(lexer.numberValue, 4.0);
 
     EXPECT_EQ(lexer.getToken(input), TokenType::END);
+}
+
+// 非法字符处理测试：遇到未知字符应该抛出 SyntaxError
+TEST_F(LexerTest, TokenizeIllegalCharacter) {
+    input.str("@");
+    input.clear();
+    EXPECT_THROW(lexer.getToken(input), SyntaxError);
+}
+
+// 非 ASCII 输入（例如中文）应被视为非法字符序列，词法器应至少对第一个字节抛出 SyntaxError
+TEST_F(LexerTest, TokenizeNonAsciiInput) {
+    // UTF-8 多字节中文字符串
+    input.str("中文");
+    input.clear();
+    EXPECT_THROW(lexer.getToken(input), SyntaxError);
 }
