@@ -22,6 +22,10 @@
 <letter> ::= "a" | "b" | ... | "z" | "A" | "B" | ... | "Z"
 ```
 
+## License
+
+This project is released under the MIT License. See the `LICENSE` file for details.
+
 ### SkiCalc使用
 1. 运行GenerateProject.bat，使用premake生成vs文件（在中文路径下会报错）；
 2. 使用vs打开项目项目文件SkiCalc.sln，编译运行；
